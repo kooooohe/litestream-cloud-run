@@ -96,6 +96,7 @@ func run() error {
 		return errors.New("data path option error")
 	}
 	_, err := os.Stat(*dataPath)
+	// TOOD do it as shell
 	if os.IsNotExist(err) {
 		// restore
 	} else {
