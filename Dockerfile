@@ -11,4 +11,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 COPY --from=builder /app/main /app/main
 COPY --from=builder /app/litestream /usr/local/bin/litestream
+COPY litestream.yml /etc/litestream.yml
 CMD ["./main"]
+
+EXPOSE 8080
