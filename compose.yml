@@ -1,0 +1,6 @@
+services:
+  app:
+    build:
+      target: builder
+      context: .
+    tty: true
