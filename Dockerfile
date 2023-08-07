@@ -14,6 +14,7 @@ COPY --from=builder /app/litestream /usr/local/bin/litestream
 COPY litestream.yml /etc/litestream.yml
 COPY start.sh /app/start.sh
 #RUN apk update && apk upgrade && apk add bash
+RUN chmod +x /app/start.sh
 CMD ["/app/start.sh"]
 
 EXPOSE 8080
