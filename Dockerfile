@@ -12,6 +12,7 @@ WORKDIR /app
 COPY --from=builder /app/main /app/main
 COPY --from=builder /app/litestream /usr/local/bin/litestream
 COPY litestream.yml /etc/litestream.yml
-CMD ["./main"]
+COPY start.sh /app/start.sh
+CMD ["sh /app/start.sh"]
 
 EXPOSE 8080
