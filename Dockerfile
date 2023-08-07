@@ -13,6 +13,7 @@ COPY --from=builder /app/main /app/main
 COPY --from=builder /app/litestream /usr/local/bin/litestream
 COPY litestream.yml /etc/litestream.yml
 COPY start.sh /app/start.sh
-CMD ["sh /app/start.sh"]
+RUN apk update && apk upgrade && apk add bash
+CMD ["bash /app/start.sh"]
 
 EXPOSE 8080
