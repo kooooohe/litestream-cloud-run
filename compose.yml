@@ -1,6 +1,7 @@
 services:
   app:
     build:
-      target: builder
+      # target: builder
       context: .
+    command: ["tail", "-f", "/dev/null"]
     tty: true
