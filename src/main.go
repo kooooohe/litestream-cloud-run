@@ -40,34 +40,34 @@ func main() {
 	}
 }
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
+func UsersHandler(w http.ResponseWriter, r *http.Request) {
+	us, err := readUsers()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	j, err := json.Marshal(us)
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
+}
+
+func AddUserHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := db.Begin()
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
-	_, err = db.Exec("INSERT INTO users(name) VALUES(?)",randString(16))
+	_, err = db.Exec("INSERT INTO users(name) VALUES(?)", randString(16))
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 	tx.Commit()
-	rows, err := db.Query("SELECT id, name FROM users")
-	if err != nil {
-		fmt.Printf("%v", err)
-		return
-	}
-	defer rows.Close()
 
-	us := []user{}
-	for rows.Next() {
-		u := user{}
-		err := rows.Scan(&u.Id, &u.Name)
-		if err != nil {
-			fmt.Printf("%v", err)
-		}
-		us = append(us, u)
-	}
+	us, err := readUsers()
 	j, err := json.Marshal(us)
 	if err != nil {
 		fmt.Printf("%v", err)
@@ -96,11 +96,6 @@ func run() error {
 		return errors.New("data path option error")
 	}
 	_, err := os.Stat(*dataPath)
-	// TOOD do it as shell
-	if os.IsNotExist(err) {
-		// restore
-	} else {
-	}
 
 	db, err = sql.Open("sqlite3", *dataPath)
 	if err != nil {
@@ -114,8 +109,29 @@ func run() error {
 		return err
 	}
 
-	http.HandleFunc("/", helloHandler)
+	http.HandleFunc("/add", AddUserHandler)
+	http.HandleFunc("/", UsersHandler)
 	go http.ListenAndServe(":8080", nil)
 	<-ctx.Done()
 	return nil
+}
+
+func readUsers() ([]user, error) {
+	rows, err := db.Query("SELECT id, name FROM users")
+	if err != nil {
+		fmt.Printf("%v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	us := []user{}
+	for rows.Next() {
+		u := user{}
+		err := rows.Scan(&u.Id, &u.Name)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
+		us = append(us, u)
+	}
+	return us, nil
 }
